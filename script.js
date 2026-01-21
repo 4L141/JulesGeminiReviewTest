@@ -4,7 +4,8 @@ const locations = [
     { city: "Tokyo", country: "Japan", timezone: "Asia/Tokyo" },
     { city: "New Delhi", country: "India", timezone: "Asia/Kolkata" },
     { city: "Sydney", country: "Australia", timezone: "Australia/Sydney" },
-    { city: "Paris", country: "France", timezone: "Europe/Paris" }
+    { city: "Paris", country: "France", timezone: "Europe/Paris" },
+    { city: "Dubai", country: "UAE", timezone: "Asia/Dubai" }
 ];
 
 const clockElements = [];
@@ -18,6 +19,7 @@ function initializeApp() {
     uiElements.showGameBtn = document.getElementById('show-game');
     uiElements.canvas = document.getElementById('snake-canvas');
     uiElements.scoreEl = document.getElementById('game-score');
+    uiElements.highScoreEl = document.getElementById('high-score');
     uiElements.startBtn = document.getElementById('start-game');
     uiElements.pauseBtn = document.getElementById('pause-game');
     uiElements.ctx = uiElements.canvas.getContext('2d');
@@ -25,6 +27,12 @@ function initializeApp() {
     initializeClocks();
     setupNavigation();
     setupGame();
+    loadHighScore();
+}
+
+function loadHighScore() {
+    const savedHighScore = localStorage.getItem('snakeHighScore') || 0;
+    uiElements.highScoreEl.textContent = savedHighScore;
 }
 
 function initializeClocks() {
@@ -145,7 +153,7 @@ function startGame() {
     dy = 0;
     spawnFood();
     if (gameInterval) clearInterval(gameInterval);
-    gameInterval = setInterval(gameLoop, 100);
+    gameInterval = setInterval(gameLoop, 80);
 }
 
 function togglePause() {
@@ -173,6 +181,15 @@ function stopGame() {
         gameInterval = null;
     }
     uiElements.pauseBtn.classList.add('hidden');
+    updateHighScore();
+}
+
+function updateHighScore() {
+    const currentHighScore = parseInt(localStorage.getItem('snakeHighScore') || 0);
+    if (score > currentHighScore) {
+        localStorage.setItem('snakeHighScore', score);
+        uiElements.highScoreEl.textContent = score;
+    }
 }
 
 function spawnFood() {
