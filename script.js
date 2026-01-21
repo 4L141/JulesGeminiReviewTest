@@ -3,7 +3,8 @@ const locations = [
     { city: "London", country: "UK", timezone: "Europe/London" },
     { city: "Tokyo", country: "Japan", timezone: "Asia/Tokyo" },
     { city: "New Delhi", country: "India", timezone: "Asia/Kolkata" },
-    { city: "Sydney", country: "Australia", timezone: "Australia/Sydney" }
+    { city: "Sydney", country: "Australia", timezone: "Australia/Sydney" },
+    { city: "Paris", country: "France", timezone: "Europe/Paris" }
 ];
 
 const clockElements = [];
@@ -18,6 +19,7 @@ function initializeApp() {
     uiElements.canvas = document.getElementById('snake-canvas');
     uiElements.scoreEl = document.getElementById('game-score');
     uiElements.startBtn = document.getElementById('start-game');
+    uiElements.pauseBtn = document.getElementById('pause-game');
     uiElements.ctx = uiElements.canvas.getContext('2d');
 
     initializeClocks();
@@ -108,11 +110,13 @@ let dy = 0;
 let nextDx = 0;
 let nextDy = 0;
 let gameInterval = null;
+let isPaused = false;
 const gridSize = 20;
 const tileCount = 20; // 400/20
 
 function setupGame() {
     uiElements.startBtn.addEventListener('click', startGame);
+    uiElements.pauseBtn.addEventListener('click', togglePause);
     window.addEventListener('keydown', handleKeyPress);
     drawPlaceholder();
 }
@@ -130,6 +134,9 @@ function drawPlaceholder() {
 function startGame() {
     console.log("Game starting...");
     score = 0;
+    isPaused = false;
+    uiElements.pauseBtn.textContent = 'Pause';
+    uiElements.pauseBtn.classList.remove('hidden');
     uiElements.scoreEl.textContent = score;
     snake = [{x: 10, y: 10}];
     nextDx = 1;
@@ -141,11 +148,31 @@ function startGame() {
     gameInterval = setInterval(gameLoop, 100);
 }
 
+function togglePause() {
+    if (!gameInterval) return;
+    isPaused = !isPaused;
+    uiElements.pauseBtn.textContent = isPaused ? 'Resume' : 'Pause';
+    if (isPaused) {
+        drawPauseScreen();
+    }
+}
+
+function drawPauseScreen() {
+    const { ctx, canvas } = uiElements;
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.5)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 30px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+}
+
 function stopGame() {
     if (gameInterval) {
         clearInterval(gameInterval);
         gameInterval = null;
     }
+    uiElements.pauseBtn.classList.add('hidden');
 }
 
 function spawnFood() {
@@ -159,6 +186,7 @@ function spawnFood() {
 }
 
 function gameLoop() {
+    if (isPaused) return;
     updateSnake();
     if (checkCollision()) {
         stopGame();
@@ -216,7 +244,7 @@ function drawGame() {
 
     // Draw snake
     snake.forEach((segment, index) => {
-        ctx.fillStyle = index === 0 ? '#10b981' : '#34d399';
+        ctx.fillStyle = index === 0 ? '#a855f7' : '#c084fc';
         ctx.fillRect(segment.x * gridSize + 1, segment.y * gridSize + 1, gridSize - 2, gridSize - 2);
     });
 }
