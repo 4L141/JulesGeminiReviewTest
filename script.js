@@ -7,10 +7,25 @@ const locations = [
 ];
 
 const clockElements = [];
+const uiElements = {};
+
+function initializeApp() {
+    // Cache UI elements
+    uiElements.clockContainer = document.getElementById('clock-container');
+    uiElements.gameContainer = document.getElementById('game-container');
+    uiElements.showClocksBtn = document.getElementById('show-clocks');
+    uiElements.showGameBtn = document.getElementById('show-game');
+    uiElements.canvas = document.getElementById('snake-canvas');
+    uiElements.scoreEl = document.getElementById('game-score');
+    uiElements.startBtn = document.getElementById('start-game');
+    uiElements.ctx = uiElements.canvas.getContext('2d');
+
+    initializeClocks();
+    setupNavigation();
+    setupGame();
+}
 
 function initializeClocks() {
-    const container = document.getElementById('clock-container');
-
     locations.forEach((loc, index) => {
         const card = document.createElement('div');
         card.className = "bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl transform transition-all hover:scale-105";
@@ -19,7 +34,7 @@ function initializeClocks() {
             <p id="time-${index}" class="text-4xl font-mono font-bold mt-4 text-emerald-400">--:--:--</p>
             <p id="date-${index}" class="text-sm text-slate-400 mt-2">---, --- --, ----</p>
         `;
-        container.appendChild(card);
+        uiElements.clockContainer.appendChild(card);
 
         // Cache the elements
         clockElements.push({
@@ -31,6 +46,8 @@ function initializeClocks() {
 }
 
 function updateClocks() {
+    if (uiElements.clockContainer.classList.contains('hidden')) return;
+
     const now = new Date();
 
     clockElements.forEach((el) => {
@@ -58,7 +75,162 @@ function updateClocks() {
     });
 }
 
+// Navigation
+function setupNavigation() {
+    uiElements.showClocksBtn.addEventListener('click', () => {
+        uiElements.clockContainer.classList.remove('hidden');
+        uiElements.gameContainer.classList.add('hidden');
+        updateNavButtons(uiElements.showClocksBtn, uiElements.showGameBtn);
+        stopGame();
+    });
+
+    uiElements.showGameBtn.addEventListener('click', () => {
+        uiElements.clockContainer.classList.add('hidden');
+        uiElements.gameContainer.classList.remove('hidden');
+        updateNavButtons(uiElements.showGameBtn, uiElements.showClocksBtn);
+    });
+}
+
+function updateNavButtons(activeBtn, inactiveBtn) {
+    activeBtn.classList.remove('bg-slate-700', 'hover:bg-slate-600');
+    activeBtn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+
+    inactiveBtn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+    inactiveBtn.classList.add('bg-slate-700', 'hover:bg-slate-600');
+}
+
+// Snake Game
+let score = 0;
+let snake = [{x: 10, y: 10}];
+let food = {x: 15, y: 15};
+let dx = 0;
+let dy = 0;
+let nextDx = 0;
+let nextDy = 0;
+let gameInterval = null;
+const gridSize = 20;
+const tileCount = 20; // 400/20
+
+function setupGame() {
+    uiElements.startBtn.addEventListener('click', startGame);
+    window.addEventListener('keydown', handleKeyPress);
+    drawPlaceholder();
+}
+
+function drawPlaceholder() {
+    const { ctx, canvas } = uiElements;
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '20px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('Press "Start New Game" to play', canvas.width / 2, canvas.height / 2);
+}
+
+function startGame() {
+    console.log("Game starting...");
+    score = 0;
+    uiElements.scoreEl.textContent = score;
+    snake = [{x: 10, y: 10}];
+    nextDx = 1;
+    nextDy = 0;
+    dx = 1;
+    dy = 0;
+    spawnFood();
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(gameLoop, 100);
+}
+
+function stopGame() {
+    if (gameInterval) {
+        clearInterval(gameInterval);
+        gameInterval = null;
+    }
+}
+
+function spawnFood() {
+    food = {
+        x: Math.floor(Math.random() * tileCount),
+        y: Math.floor(Math.random() * tileCount)
+    };
+    if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+        spawnFood();
+    }
+}
+
+function gameLoop() {
+    updateSnake();
+    if (checkCollision()) {
+        stopGame();
+        drawGameOver();
+        return;
+    }
+    drawGame();
+}
+
+function drawGameOver() {
+    const { ctx, canvas } = uiElements;
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.8)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f43f5e';
+    ctx.font = 'bold 30px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 20);
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = '20px Inter';
+    ctx.fillText(`Final Score: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+}
+
+function updateSnake() {
+    dx = nextDx;
+    dy = nextDy;
+    const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+    snake.unshift(head);
+    if (head.x === food.x && head.y === food.y) {
+        score += 10;
+        uiElements.scoreEl.textContent = score;
+        spawnFood();
+    } else {
+        snake.pop();
+    }
+}
+
+function checkCollision() {
+    const head = snake[0];
+    if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) return true;
+    for (let i = 1; i < snake.length; i++) {
+        if (snake[i].x === head.x && snake[i].y === head.y) return true;
+    }
+    return false;
+}
+
+function drawGame() {
+    const { ctx, canvas } = uiElements;
+    // Clear canvas
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw food
+    ctx.fillStyle = '#f43f5e';
+    ctx.fillRect(food.x * gridSize + 2, food.y * gridSize + 2, gridSize - 4, gridSize - 4);
+
+    // Draw snake
+    snake.forEach((segment, index) => {
+        ctx.fillStyle = index === 0 ? '#10b981' : '#34d399';
+        ctx.fillRect(segment.x * gridSize + 1, segment.y * gridSize + 1, gridSize - 2, gridSize - 2);
+    });
+}
+
+function handleKeyPress(e) {
+    switch(e.key) {
+        case 'ArrowUp': case 'w': case 'W': if (dy !== 1) { nextDx = 0; nextDy = -1; } break;
+        case 'ArrowDown': case 's': case 'S': if (dy !== -1) { nextDx = 0; nextDy = 1; } break;
+        case 'ArrowLeft': case 'a': case 'A': if (dx !== 1) { nextDx = -1; nextDy = 0; } break;
+        case 'ArrowRight': case 'd': case 'D': if (dx !== -1) { nextDx = 1; nextDy = 0; } break;
+    }
+}
+
 // Initialize and then update every second
-initializeClocks();
+initializeApp();
 updateClocks();
 setInterval(updateClocks, 1000);
