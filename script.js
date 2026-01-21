@@ -18,8 +18,10 @@ function initializeApp() {
     uiElements.showGameBtn = document.getElementById('show-game');
     uiElements.canvas = document.getElementById('snake-canvas');
     uiElements.scoreEl = document.getElementById('game-score');
+    uiElements.highScoreEl = document.getElementById('high-score');
     uiElements.startBtn = document.getElementById('start-game');
     uiElements.pauseBtn = document.getElementById('pause-game');
+    uiElements.speedInput = document.getElementById('game-speed');
     uiElements.ctx = uiElements.canvas.getContext('2d');
 
     initializeClocks();
@@ -47,33 +49,38 @@ function initializeClocks() {
     });
 }
 
+function formatLocationDateTime(timezone, date) {
+    const timeOptions = {
+        timeZone: timezone,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    };
+
+    const dateOptions = {
+        timeZone: timezone,
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+
+    return {
+        time: new Intl.DateTimeFormat('en-US', timeOptions).format(date),
+        date: new Intl.DateTimeFormat('en-US', dateOptions).format(date)
+    };
+}
+
 function updateClocks() {
     if (uiElements.clockContainer.classList.contains('hidden')) return;
 
     const now = new Date();
 
     clockElements.forEach((el) => {
-        const timeOptions = {
-            timeZone: el.timezone,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        };
-
-        const dateOptions = {
-            timeZone: el.timezone,
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        };
-
-        const timeString = new Intl.DateTimeFormat('en-US', timeOptions).format(now);
-        const dateString = new Intl.DateTimeFormat('en-US', dateOptions).format(now);
-
-        el.timeEl.textContent = timeString;
-        el.dateEl.textContent = dateString;
+        const { time, date } = formatLocationDateTime(el.timezone, now);
+        el.timeEl.textContent = time;
+        el.dateEl.textContent = date;
     });
 }
 
@@ -103,6 +110,7 @@ function updateNavButtons(activeBtn, inactiveBtn) {
 
 // Snake Game
 let score = 0;
+let highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
 let snake = [{x: 10, y: 10}];
 let food = {x: 15, y: 15};
 let dx = 0;
@@ -117,6 +125,7 @@ const tileCount = 20; // 400/20
 function setupGame() {
     uiElements.startBtn.addEventListener('click', startGame);
     uiElements.pauseBtn.addEventListener('click', togglePause);
+    uiElements.highScoreEl.textContent = highScore;
     window.addEventListener('keydown', handleKeyPress);
     drawPlaceholder();
 }
@@ -145,7 +154,8 @@ function startGame() {
     dy = 0;
     spawnFood();
     if (gameInterval) clearInterval(gameInterval);
-    gameInterval = setInterval(gameLoop, 100);
+    const speed = 250 - parseInt(uiElements.speedInput.value);
+    gameInterval = setInterval(gameLoop, speed);
 }
 
 function togglePause() {
@@ -173,6 +183,15 @@ function stopGame() {
         gameInterval = null;
     }
     uiElements.pauseBtn.classList.add('hidden');
+    updateHighScore();
+}
+
+function updateHighScore() {
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('snakeHighScore', highScore);
+        uiElements.highScoreEl.textContent = highScore;
+    }
 }
 
 function spawnFood() {
