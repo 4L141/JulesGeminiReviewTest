@@ -1,0 +1,14 @@
+{
+  "Status": "success",
+  "Message": "Login successful",
+  "User": {
+    "id": 7,
+    "email": "alicedoe@gmail.com",
+    "role": "user"
+  },
+  "UsersList": null,
+  "Tables": null,
+  "Rows": null,
+  "Columns": null,
+  "AvailableSlots": null
+}
