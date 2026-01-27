@@ -1,0 +1,7 @@
+{
+    "Action": "create_booking",
+    "user_id": 7,
+    "service": "installation",
+    "date": "2026-01-29",
+    "time": "12:00:00"
+}

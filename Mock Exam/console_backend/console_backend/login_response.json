@@ -1,0 +1,9 @@
+{
+  "Status": "success",
+  "Message": "Login successful",
+  "User": {
+    "id": 4,
+    "email": "jane.doe2@gmail.com"
+  },
+  "UsersList": null
+}

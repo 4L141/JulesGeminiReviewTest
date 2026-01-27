@@ -1,0 +1,10 @@
+{
+  "Status": "error",
+  "Message": "Slot already booked",
+  "User": null,
+  "UsersList": null,
+  "Tables": null,
+  "Rows": null,
+  "Columns": null,
+  "AvailableSlots": null
+}
