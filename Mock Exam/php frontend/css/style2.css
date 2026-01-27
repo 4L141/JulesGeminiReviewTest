@@ -1,0 +1,145 @@
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700&display=swap");
+
+
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color:#C8E6C9;
+}
+
+.navbar {
+  height: 60px;
+  width: 90vw;
+  margin: 0 auto;
+  margin-top: 65px;
+  padding-left: 1em;
+  padding-right: 1em;
+  box-sizing: border-box;
+  display: flex;
+  box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.15),
+    0px 10px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 9px;
+  position: relative;
+  background-color: #2E7D32;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1em;
+  position: relative;
+  z-index: 2;
+}
+
+.navbar .logo {
+  text-transform: uppercase;
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: 300;
+  font-size: 16pt;
+}
+
+.navbar .logo a {
+  text-decoration: none;
+  color: #090909;
+}
+
+.navbar ul {
+  list-style: none;
+  margin: 0 auto;
+  display: flex;
+  gap: 20px;
+  padding: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-left: 4em;
+}
+
+.navbar ul li {
+  display: inline;
+  text-decoration: none;
+}
+
+.navbar ul li a {
+  padding: 0.25em 1em 0.25em 1em;
+  color: #090909;
+  text-decoration: none;
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: 400;
+}
+
+.navbar a:hover {
+  color: #C8E6C9;
+  transition-duration: 0.3s;
+}
+
+
+
+
+.dropbtn {
+    background-color: #04AA6D;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .dropbtn:hover, .dropbtn:focus {
+    background-color: #3e8e41;
+  }
+
+  .dropdown {
+    float: right;
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    right: 0;
+    z-index: 1;
+  }
+
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+
+  .dropdown a:hover {background-color: #ddd;}
+
+  .show {display: block;}
+
+  /*Homepage*/
+
+  .hero img {
+    width: 90%;
+    margin: 2em auto;
+    display: block;
+    border-radius: 15px;
+}
+
+.info-section {
+    background-color: #C8E6C9;
+    width: 90%;
+    margin: 2em auto;
+    padding: 2em;
+    border-radius: 10px;
+    font-family: "Source Sans Pro", sans-serif;
+}
+
+.info-section h2 {
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+.info-section p {
+    margin: 1em 0;
+    line-height: 1.6;
+}

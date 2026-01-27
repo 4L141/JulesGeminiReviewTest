@@ -1,0 +1,9 @@
+{
+  "Action": "signup",
+  "user_id": 0,
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "0771234567",
+  "password": "P@ssw0rd123"
+}
