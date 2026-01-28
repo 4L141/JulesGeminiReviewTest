@@ -18,6 +18,7 @@ function initializeApp() {
     uiElements.showGameBtn = document.getElementById('show-game');
     uiElements.canvas = document.getElementById('snake-canvas');
     uiElements.scoreEl = document.getElementById('game-score');
+    uiElements.highScoreEl = document.getElementById('high-score');
     uiElements.startBtn = document.getElementById('start-game');
     uiElements.pauseBtn = document.getElementById('pause-game');
     uiElements.ctx = uiElements.canvas.getContext('2d');
@@ -118,7 +119,15 @@ function setupGame() {
     uiElements.startBtn.addEventListener('click', startGame);
     uiElements.pauseBtn.addEventListener('click', togglePause);
     window.addEventListener('keydown', handleKeyPress);
+    loadHighScore();
     drawPlaceholder();
+}
+
+function loadHighScore() {
+    const savedScore = localStorage.getItem('snakeHighScore');
+    if (savedScore) {
+        uiElements.highScoreEl.textContent = savedScore;
+    }
 }
 
 function drawPlaceholder() {
@@ -217,9 +226,18 @@ function updateSnake() {
     if (head.x === food.x && head.y === food.y) {
         score += 10;
         uiElements.scoreEl.textContent = score;
+        checkHighScore();
         spawnFood();
     } else {
         snake.pop();
+    }
+}
+
+function checkHighScore() {
+    const currentHighScore = parseInt(localStorage.getItem('snakeHighScore') || '0');
+    if (score > currentHighScore) {
+        localStorage.setItem('snakeHighScore', score);
+        uiElements.highScoreEl.textContent = score;
     }
 }
 
